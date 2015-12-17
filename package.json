@@ -1,0 +1,31 @@
+{
+  "name": "replacexml",
+  "description": "Simple utility to replace values in one or more XML files",
+  "version": "1.0.0",
+  "preferGlobal": true,
+
+  "homepage": "https://github.com/mike-feldmeier/replacexml",
+  "bugs": "https://github.com/mike-feldmeier/replacexml/issues",
+  "author": "Mike Feldmeier <mike.feldmeier@gmail.com> (http://www.mikefeldmeier.com)",
+
+  "license": "MIT",
+  "keywords": [
+    "xml",
+    "utilities",
+    "command"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mike-feldmeier/replacexml.git"
+  },
+
+  "bin": {
+    "replacexml": "replacexml.js"
+  },
+
+  "dependencies": {
+    "pathutils": "latest",
+    "xmldom": "latest",
+    "xpath": "latest"
+  }
+}

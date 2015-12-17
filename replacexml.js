@@ -19,9 +19,12 @@ makeFileList(context.locations).forEach(function(file) {
     if(err) throw err;
 
     var document = new dom().parseFromString(data);
+    var namespaces = determineNamespaces(document);
 
     context.expressions.forEach(function(expression) {
-      xpath.select(expression.match, document).forEach(function(node) {
+      var select = xpath.useNamespaces(namespaces);
+      select(expression.match, document).forEach(function(node) {
+      	console.log('%s: Matched %s: Replacing "%s" with "%s"', file, expression.match, node.firstChild.data, expression.value);
         node.firstChild.data = expression.value;
       });
     });
@@ -31,6 +34,17 @@ makeFileList(context.locations).forEach(function(file) {
     });
   });
 });
+
+function determineNamespaces(document) {
+	var result = {};
+
+	Object.keys(document.documentElement.attributes).forEach(function(key) {
+		var attr = document.documentElement.attributes[key];
+		result[attr.localName] = attr.value;
+	});
+
+	return result;
+}
 
 /**
  * Takes in arguments and determines if they are locations or match parameters

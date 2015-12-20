@@ -1,7 +1,7 @@
 {
   "name": "replacexml",
   "description": "Simple utility to replace values in one or more XML files",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "preferGlobal": true,
 
   "homepage": "https://github.com/mike-feldmeier/replacexml",

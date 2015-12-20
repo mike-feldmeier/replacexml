@@ -7,33 +7,42 @@ var pathutils = require('pathutils');
 var dom       = require('xmldom').DOMParser;
 var xpath     = require('xpath');
 
-if(process.argv.length == 2) {
-  console.log('Usage: replacexml <[xpath=newvalue ...] [dirname ...] [filename ...]>');
-  process.exit(0);
+if(module.parent) {
+  module.exports = doReplace;
+}
+else {
+  if(process.argv.length == 2) {
+    console.log('Usage: replacexml <[xpath=newvalue ...] [dirname ...] [filename ...]>');
+    process.exit(0);
+  }
+
+  doReplace(process.argv.slice(2));
 }
 
-var context = determineArguments(process.argv.slice(2));
+function doReplace(args) {
+  var context = determineArguments(args);
 
-makeFileList(context.locations).forEach(function(file) {
-  fs.readFile(file, 'utf-8', function(err, data) {
-    if(err) throw err;
+  makeFileList(context.locations).forEach(function(file) {
+    fs.readFile(file, 'utf-8', function(err, data) {
+      if(err) throw err;
 
-    var document = new dom().parseFromString(data);
-    var namespaces = determineNamespaces(document);
+      var document = new dom().parseFromString(data);
+      var namespaces = determineNamespaces(document);
 
-    context.expressions.forEach(function(expression) {
-      var select = xpath.useNamespaces(namespaces);
-      select(expression.match, document).forEach(function(node) {
-      	console.log('%s: Matched %s: Replacing "%s" with "%s"', file, expression.match, node.firstChild.data, expression.value);
-        node.firstChild.data = expression.value;
+      context.expressions.forEach(function(expression) {
+        var select = xpath.useNamespaces(namespaces);
+        select(expression.match, document).forEach(function(node) {
+        	console.log('%s: Matched %s: Replacing "%s" with "%s"', file, expression.match, node.firstChild.data, expression.value);
+          node.firstChild.data = expression.value;
+        });
+      });
+
+      fs.writeFile(file, document.toString(), 'utf-8', function(err) {
+        if(err) throw err;
       });
     });
-
-    fs.writeFile(file, document.toString(), 'utf-8', function(err) {
-      if(err) throw err;
-    });
   });
-});
+}
 
 function determineNamespaces(document) {
 	var result = {};
@@ -55,8 +64,7 @@ function determineNamespaces(document) {
 function determineArguments(argv) {
   var result = {
     expressions: [],
-    locations: [],
-    cwd: process.cwd()
+    locations: []
   };
 
   argv.forEach(function(value, index, array) {
